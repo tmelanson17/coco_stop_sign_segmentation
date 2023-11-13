@@ -10,6 +10,12 @@ def sort_by_percentage_red(segmentation, threshold=0.8):
     mask = np.bitwise_and(mask, segmentation[:,:,2] > HIGH_THRESHOLD)
     return np.sum(mask) / np.sum(segmentation[:,:,2] > 0) > threshold
 
+# Sort by at least x% of the image
+def sort_by_size(segmentation, threshold=0.1):
+    mask = segmentation[:,:,0] > 0
+    h,w,_ = segmentation.shape
+    return np.sum(mask) / (h*w) > threshold
+
 
 
 
@@ -29,7 +35,7 @@ for image, image_data in image_iterator:
         # Apply the mask to the image to segment the stop sign
         segmented_stop_sign = cv2.bitwise_and(image, image, mask=mask)
         total_count+=1
-        if sort_by_percentage_red(segmented_stop_sign, 0.2):
+        if sort_by_size(segmented_stop_sign) and sort_by_percentage_red(segmented_stop_sign, 0.2):
             threshold_count+=1
 
             # Save the segmented stop sign as a separate image
